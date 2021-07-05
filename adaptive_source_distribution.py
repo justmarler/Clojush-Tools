@@ -66,21 +66,12 @@ if not os.path.exists(outputDirectory + 'distributions/'):
 outputFilePrefix = "log"
 outputFileSuffix = ".txt"
 
-selected_runs = False
-if len(sys.argv) > 2:
-    runs = map(int, sys.argv[2:])
-    selected_runs = True
-
 i = 0
 
 expression = r'^{:instruction (.*), :count ([0-9]*), :dcdf ([0-9]*)}'
 matcher = re.compile(expression)
 
 while (outputFilePrefix + str(i) + outputFileSuffix) in dirList:
-
-    if selected_runs and i not in runs:
-        i += 1
-        continue
 
     fileName = (outputFilePrefix + str(i) + outputFileSuffix)
 
@@ -107,9 +98,10 @@ while (outputFilePrefix + str(i) + outputFileSuffix) in dirList:
                 prev_line = ""
         
         instruction, count, dcdf = match.groups()
+        instruction = instruction.replace('\t', r'\t')
+        instruction = instruction.replace('"', "")
         distributions.append([instruction, count, dcdf])
 
-    # Using TSV because some instructions have commas.
     with open(outputDirectory + 'distributions/' +\
         outputFilePrefix + str(i) + 'adaptive.tsv', 'w+') as res:
 
